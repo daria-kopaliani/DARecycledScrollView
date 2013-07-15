@@ -1,10 +1,14 @@
 DARecycledScrollView
 ====================
 
+UIScrollView subclass that reuses its tile views
+DARecycledScrollView
+====================
+
+A UIScrollView subclass that reuses its tile views very much like UITableView does: there is a dataSource object which is used to configure scroll view subviews.
+
+
 ![Alt text](DARecycledScrollView.gif)
-
-A UIScrollView subclass that reuses its tile views very much like UITableView does: there is a dataSource object which is used to configure scroll view subviews
-
 
 Features
 ==============
