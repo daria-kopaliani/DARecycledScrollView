@@ -77,13 +77,13 @@
 
 #pragma mark * Overwritten setters
 
-- (void)setInfinte:(BOOL)infinte
+- (void)setInfinte:(BOOL)infinite
 {
-    if (_infinte != infinte) {
+    if (_infinite != infinite) {
         [self clear];
     }
-    _infinte = infinte;
-    if (infinte) {
+    _infinite = infinite;
+    if (infinite) {
         self.showsHorizontalScrollIndicator = NO;
     }
     [self reloadData];
@@ -91,7 +91,7 @@
 
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
 {
-    if (!(showsHorizontalScrollIndicator && self.infinte)) {
+    if (!(showsHorizontalScrollIndicator && self.infinite)) {
         [super setShowsHorizontalScrollIndicator:showsHorizontalScrollIndicator];
     }
 }
@@ -146,7 +146,7 @@
         lastNeededTileIndex++;
     }
     firstNeededTileIndex = MAX(firstNeededTileIndex, 0);
-    if (!self.infinte) {
+    if (!self.infinite) {
         lastNeededTileIndex = MIN(lastNeededTileIndex, [self tilesCount] - 1);
     } else {
         if (lastNeededTileIndex * self.tileWidth < CGRectGetWidth(self.frame)) {
@@ -199,7 +199,7 @@
 
 - (CGSize)contentSize
 {
-    if (self.infinte) {
+    if (self.infinite) {
         return CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.frame));
     }
     return CGSizeMake([self tilesCount] * [self tileWidth], self.frame.size.height);
@@ -208,7 +208,7 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    if (self.infinte && self.contentOffset.x > [self tilesCount] * [self tileWidth] && !self.decelerating && !self.dragging) {
+    if (self.infinite && self.contentOffset.x > [self tilesCount] * [self tileWidth] && !self.decelerating && !self.dragging) {
         CGFloat x = floorf(self.contentOffset.x / (self.tilesCount * self.tileWidth)) * self.tilesCount * self.tileWidth;
         [self setContentOffset:CGPointMake(self.contentOffset.x - x, self.contentOffset.y) animated:NO];
     }

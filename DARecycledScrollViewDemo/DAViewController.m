@@ -61,7 +61,7 @@ static NSString *ScrollViewCellIdentifier = @"scrollViewCell";
         } break;
         case 2: {
             cell.images = @[[UIImage imageNamed:@"beaver.jpg"]];
-            cell.scrollView.infinte = YES;
+            cell.scrollView.infinite = YES;
         }
         default: break;
     }
