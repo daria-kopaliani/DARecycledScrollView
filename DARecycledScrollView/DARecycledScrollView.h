@@ -22,7 +22,7 @@
 
 @interface DARecycledScrollView : UIScrollView
 
-@property (assign, nonatomic) BOOL infinte;
+@property (assign, nonatomic) BOOL infinite;
 @property (weak, nonatomic) id<DARecycledScrollViewDataSource> dataSource;
 
 - (DARecycledTileView *)dequeueRecycledTileView;
