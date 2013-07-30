@@ -111,9 +111,7 @@
 
 - (void)configureTileView:(DARecycledTileView *)tileView forIndex:(NSUInteger)index
 {
-    NSInteger page = floorf((float)index / (float)[self tilesCount]);
-    NSInteger actualIndex = (index < [self tilesCount]) ? index : index - page * [self tilesCount];
-    CGFloat width = [self tileWidthForIndex:actualIndex];
+    CGFloat width = [self widthForTileAtIndex:index];
 	CGRect tileViewFrame = CGRectMake(0., 0., width, self.frame.size.height);
     tileViewFrame.origin.x = [self combinedWidthForTilesUntilIndex:index];
     tileViewFrame.size.width = width;
@@ -191,11 +189,6 @@
             [self configureTileView:tileView forIndex:index];
         }
     }
-}
-
-- (CGFloat)tileWidthForIndex:(NSUInteger)index
-{
-    return [self.dataSource widthForTileAtIndex:index scrollView:self];
 }
 
 - (CGFloat)combinedWidthForTilesUntilIndex:(NSInteger)index
