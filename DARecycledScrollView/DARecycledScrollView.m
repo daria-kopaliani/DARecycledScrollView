@@ -77,12 +77,12 @@
 
 #pragma mark * Overwritten setters
 
-- (void)setInfinte:(BOOL)infinite
+- (void)setInfinite:(BOOL)infinite
 {
     if (_infinite != infinite) {
+        _infinite = infinite;
         [self clear];
     }
-    _infinite = infinite;
     if (infinite) {
         self.showsHorizontalScrollIndicator = NO;
     }
@@ -111,10 +111,11 @@
 
 - (void)configureTileView:(DARecycledTileView *)tileView forIndex:(NSUInteger)index
 {
-	CGRect tileViewFrame = CGRectMake(0., 0., [self tileWidth], self.frame.size.height);
-    CGFloat width = [self tileWidth];
-	CGFloat offset = 0;
-    tileViewFrame.origin.x = offset + index * width;
+    NSInteger page = floorf((float)index / (float)[self tilesCount]);
+    NSInteger actualIndex = (index < [self tilesCount]) ? index : index - page * [self tilesCount];
+    CGFloat width = [self tileWidthForIndex:actualIndex];
+	CGRect tileViewFrame = CGRectMake(0., 0., width, self.frame.size.height);
+    tileViewFrame.origin.x = [self combinedWidthForTilesUntilIndex:index];
     tileViewFrame.size.width = width;
     tileView.frame = tileViewFrame;
 }
@@ -137,10 +138,19 @@
 - (void)tileViews
 {
     CGRect visibleBounds = self.bounds;
-    CGFloat tileWidth = [self tileWidth];
-	CGFloat offset = 0.;
-    int firstNeededTileIndex = floorf((CGRectGetMinX(visibleBounds) - offset) / tileWidth);
-    NSInteger lastNeededTileIndex = floorf((CGRectGetMaxX(visibleBounds)) / tileWidth);
+    NSInteger firstNeededTileIndex = 0;
+    CGFloat width = [self widthForTileAtIndex:firstNeededTileIndex];
+    
+    while (width < CGRectGetMinX(visibleBounds)) {
+        firstNeededTileIndex++;
+        width += [self widthForTileAtIndex:firstNeededTileIndex];
+    }
+    
+    NSInteger lastNeededTileIndex = firstNeededTileIndex;
+    while (width <= CGRectGetMaxX(visibleBounds)) {
+        lastNeededTileIndex++;
+        width += [self widthForTileAtIndex:lastNeededTileIndex];
+    }
     if (!self.clipsToBounds) {
         firstNeededTileIndex--;
         lastNeededTileIndex++;
@@ -149,10 +159,12 @@
     if (!self.infinite) {
         lastNeededTileIndex = MIN(lastNeededTileIndex, [self tilesCount] - 1);
     } else {
-        if (lastNeededTileIndex * self.tileWidth < CGRectGetWidth(self.frame)) {
-            lastNeededTileIndex = ceilf(CGRectGetWidth(self.frame) / self.tileWidth);
+        CGFloat actualWidth = [self combinedWidthForTilesUntilIndex:lastNeededTileIndex + 1];
+        while (actualWidth < CGRectGetMaxX(visibleBounds)) {
+            lastNeededTileIndex += [self tilesCount];
+            actualWidth = [self combinedWidthForTilesUntilIndex:lastNeededTileIndex + 1];
         }
-    } 
+    }
     for (DARecycledTileView *tileView in self.visibleTileViews) {
         if (tileView.index < firstNeededTileIndex || tileView.index > lastNeededTileIndex) {
             [self.recycledTileViews addObject:tileView];
@@ -165,7 +177,8 @@
 	}
 
     for (NSUInteger index = firstNeededTileIndex; index <= lastNeededTileIndex; index++) {
-        NSInteger actualIndex = index - floorf((float)index / [self tilesCount]) * [self tilesCount];
+        NSInteger page = floorf((float)index / (float)[self tilesCount]);
+        NSInteger actualIndex = (index < [self tilesCount]) ? index : index - page * [self tilesCount];
         if (![self isDisplayingTileForIndex:index]) {
             DARecycledTileView *tileView = [self.dataSource tileViewForRecycledScrollView:self];
             tileView.index = index;
@@ -180,9 +193,25 @@
     }
 }
 
-- (CGFloat)tileWidth
+- (CGFloat)tileWidthForIndex:(NSUInteger)index
 {
-    return [self.dataSource widthForTileInScrollView:self];
+    return [self.dataSource widthForTileAtIndex:index scrollView:self];
+}
+
+- (CGFloat)combinedWidthForTilesUntilIndex:(NSInteger)index
+{
+    CGFloat width = 0.;
+    for (NSInteger i = 0; i < index; i++) {
+        width += [self widthForTileAtIndex:i];
+    }
+    return width;
+}
+
+- (CGFloat)widthForTileAtIndex:(NSInteger)index
+{
+    NSInteger page = floorf((float)index / (float)[self tilesCount]);
+    NSInteger actualIndex = (index < [self tilesCount]) ? index : index - page * [self tilesCount];
+    return [self.dataSource widthForTileAtIndex:actualIndex scrollView:self];
 }
 
 - (DARecycledTileView *)visibleTileViewForIndex:(NSUInteger)index
@@ -202,14 +231,15 @@
     if (self.infinite) {
         return CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.frame));
     }
-    return CGSizeMake([self tilesCount] * [self tileWidth], self.frame.size.height);
+    return CGSizeMake([self combinedWidthForTilesUntilIndex:[self tilesCount]], self.frame.size.height);
 }
 
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    if (self.infinite && self.contentOffset.x > [self tilesCount] * [self tileWidth] && !self.decelerating && !self.dragging) {
-        CGFloat x = floorf(self.contentOffset.x / (self.tilesCount * self.tileWidth)) * self.tilesCount * self.tileWidth;
+    CGFloat contentWidth = self.contentSize.width;
+    if (self.infinite && self.contentOffset.x > contentWidth && !self.decelerating && !self.dragging) {
+        CGFloat x = floorf(self.contentOffset.x / contentWidth) * contentWidth;
         [self setContentOffset:CGPointMake(self.contentOffset.x - x, self.contentOffset.y) animated:NO];
     }
     [self tileViews];

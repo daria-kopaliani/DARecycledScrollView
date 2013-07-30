@@ -51,17 +51,16 @@
 {
     DAImageTileView *tileView = (DAImageTileView *)[scrollView dequeueRecycledTileView];
     if (!tileView) {
-        tileView = [[DAImageTileView alloc] initWithFrame:CGRectMake(0., 0., [self widthForTileInScrollView:scrollView],
-                                                                     CGRectGetHeight(scrollView.frame))];
+        tileView = [[DAImageTileView alloc] initWithFrame:CGRectMake(0., 0., 100., CGRectGetHeight(scrollView.frame))];
         tileView.displayRecycledIndex = YES;
     }
     return tileView;
 }
 
-- (CGFloat)widthForTileInScrollView:(DARecycledScrollView *)scrollView
+- (CGFloat)widthForTileAtIndex:(NSInteger)index scrollView:(DARecycledScrollView *)scrollView
 {
-    UIImage *anyImage = [self.images lastObject];
-    return anyImage.size.width;
+    UIImage *image = self.images[index];
+    return image.size.width;
 }
 
 @end

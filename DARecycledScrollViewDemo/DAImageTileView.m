@@ -29,6 +29,7 @@
 //        frame.size.height -= 1.;
         self.imageView = [[UIImageView alloc] initWithFrame:self.bounds];
         self.imageView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:self.imageView];
     }
     self.imageView.image = image;

@@ -53,9 +53,9 @@ static NSString *ScrollViewCellIdentifier = @"scrollViewCell";
                             [UIImage imageNamed:@"dog6.jpg"], [UIImage imageNamed:@"dog7.jpg"]];
         } break;
         case 1: {
-            cell.images = @[[UIImage imageNamed:@"cat1.jpg"], [UIImage imageNamed:@"cat6.jpg"], [UIImage imageNamed:@"cat0.jpg"],
+            cell.images = @[[UIImage imageNamed:@"cat5.jpg"], [UIImage imageNamed:@"cat6.jpg"], [UIImage imageNamed:@"cat0.jpg"],
                             [UIImage imageNamed:@"cat4.jpg"], [UIImage imageNamed:@"cat7.jpg"], [UIImage imageNamed:@"cat2.jpg"],
-                            [UIImage imageNamed:@"cat5.jpg"]];
+                            [UIImage imageNamed:@"cat1.jpg"]];
             cell.scrollView.pagingEnabled = YES;
             cell.scrollView.showsHorizontalScrollIndicator = NO;
         } break;
