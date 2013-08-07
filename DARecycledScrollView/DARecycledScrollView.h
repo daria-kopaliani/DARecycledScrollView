@@ -27,5 +27,6 @@
 
 - (DARecycledTileView *)dequeueRecycledTileView;
 - (void)reloadData;
+- (void)scrollToTileAtIndex:(NSUInteger)index animated:(BOOL)animated;
 
 @end

@@ -23,15 +23,31 @@
 
 static NSString *ScrollViewCellIdentifier = @"scrollViewCell";
 
+#pragma mark - View life cycle
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor lightGrayColor];
-    [self.tableView reloadData];    
+    [self.tableView reloadData];
+    UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0., 0., 320., 44.)];
+    [btn.titleLabel setHighlightedTextColor:[UIColor grayColor]];
+    [btn setTitle:@"Scroll to 4th tile view" forState:UIControlStateNormal];
+    [btn addTarget:self action:@selector(scrollToFifthTileView) forControlEvents:UIControlEventTouchUpInside];
+    self.tableView.tableHeaderView = btn;
 }
 
-#pragma mark - Table view data source
+#pragma mark - Private
+
+- (void)scrollToFifthTileView
+{
+    for (DAScrollViewCell *cell in self.tableView.visibleCells) {
+        [cell.scrollView scrollToTileAtIndex:4 animated:YES];
+    }
+}
+
+#pragma mark * Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
