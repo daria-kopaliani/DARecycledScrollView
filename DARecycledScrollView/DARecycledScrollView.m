@@ -79,8 +79,8 @@
 {
     NSAssert(index > 0 && (index < self.tilesCount || self.infinite), @"Index out of bounds");
     CGPoint offset = self.contentOffset;
-    // TODO: this is not always the case. i.e. when index = self.tiles.count - 1 
-    offset.x = [self combinedWidthForTilesUntilIndex:index];
+    CGFloat x = [self combinedWidthForTilesUntilIndex:index];
+    offset.x = MIN(x, self.contentSize.width - CGRectGetWidth(self.bounds));
     [self setContentOffset:offset animated:animated];
 }
 

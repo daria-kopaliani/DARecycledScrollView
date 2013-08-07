@@ -33,7 +33,7 @@ static NSString *ScrollViewCellIdentifier = @"scrollViewCell";
     [self.tableView reloadData];
     UIButton *btn = [[UIButton alloc] initWithFrame:CGRectMake(0., 0., 320., 44.)];
     [btn.titleLabel setHighlightedTextColor:[UIColor grayColor]];
-    [btn setTitle:@"Scroll to 4th tile view" forState:UIControlStateNormal];
+    [btn setTitle:@"Scroll to 5th tile view" forState:UIControlStateNormal];
     [btn addTarget:self action:@selector(scrollToFifthTileView) forControlEvents:UIControlEventTouchUpInside];
     self.tableView.tableHeaderView = btn;
 }
@@ -43,7 +43,7 @@ static NSString *ScrollViewCellIdentifier = @"scrollViewCell";
 - (void)scrollToFifthTileView
 {
     for (DAScrollViewCell *cell in self.tableView.visibleCells) {
-        [cell.scrollView scrollToTileAtIndex:4 animated:YES];
+        [cell.scrollView scrollToTileAtIndex:5 animated:YES];
     }
 }
 
