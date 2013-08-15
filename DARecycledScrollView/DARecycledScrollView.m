@@ -89,6 +89,14 @@
     [self reloadData];
 }
 
+- (void)setDataSource:(id<DARecycledScrollViewDataSource>)dataSource
+{
+    if (_dataSource != dataSource) {
+        _dataSource = dataSource;
+        [self reloadData];
+    }
+}
+
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
 {
     if (!(showsHorizontalScrollIndicator && self.infinite)) {
