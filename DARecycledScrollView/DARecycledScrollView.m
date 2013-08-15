@@ -109,6 +109,13 @@
 	self.contentSize = self.frame.size;
 }
 
+-(void)touchUpInsideTile:(id)sender{
+    if(self.delegate){
+        DARecycledTileView *tile = sender;
+        [self.delegate recycledScrollView:self didSelectRowAtIndex:tile.index];
+    }
+}
+
 - (void)configureTileView:(DARecycledTileView *)tileView forIndex:(NSUInteger)index
 {
     CGFloat width = [self widthForTileAtIndex:index];
@@ -116,6 +123,7 @@
     tileViewFrame.origin.x = [self combinedWidthForTilesUntilIndex:index];
     tileViewFrame.size.width = width;
     tileView.frame = tileViewFrame;
+    [tileView addTarget:self action:@selector(touchUpInsideTile:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (BOOL)isDisplayingTileForIndex:(NSUInteger)index

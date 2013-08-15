@@ -10,6 +10,7 @@
 
 
 @class DARecycledScrollView, DARecycledTileView;
+
 @protocol DARecycledScrollViewDataSource <NSObject>
 
 - (NSInteger)numberOfTilesInScrollView:(DARecycledScrollView *)scrollView;
@@ -19,11 +20,18 @@
 
 @end
 
+@protocol DARecycledScrollViewDelegate <UIScrollViewDelegate>
+
+- (void)recycledScrollView:(DARecycledScrollView *)scrollVIew didSelectRowAtIndex:(NSUInteger)index;
+
+@end
+
 
 @interface DARecycledScrollView : UIScrollView
 
 @property (assign, nonatomic) BOOL infinite;
 @property (weak, nonatomic) IBOutlet id<DARecycledScrollViewDataSource> dataSource;
+@property (weak, nonatomic) IBOutlet id<DARecycledScrollViewDelegate> delegate;
 
 - (DARecycledTileView *)dequeueRecycledTileView;
 - (void)reloadData;
