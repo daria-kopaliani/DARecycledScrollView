@@ -152,6 +152,7 @@
 
 - (void)tileViews
 {
+    if([self tilesCount] == 0) return;
     CGRect visibleBounds = self.bounds;
     NSInteger firstNeededTileIndex = 0;
     CGFloat width = [self widthForTileAtIndex:firstNeededTileIndex];
@@ -247,7 +248,6 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    if([self tilesCount] == 0) return;
     CGFloat contentWidth = self.contentSize.width;
     if (self.infinite && self.contentOffset.x > contentWidth && !self.decelerating && !self.dragging) {
         CGFloat x = floorf(self.contentOffset.x / contentWidth) * contentWidth;
