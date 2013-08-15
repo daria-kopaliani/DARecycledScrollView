@@ -89,6 +89,14 @@
     [self reloadData];
 }
 
+- (void)setDataSource:(id<DARecycledScrollViewDataSource>)dataSource
+{
+    if (_dataSource != dataSource) {
+        _dataSource = dataSource;
+        [self reloadData];
+    }
+}
+
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
 {
     if (!(showsHorizontalScrollIndicator && self.infinite)) {
@@ -109,6 +117,13 @@
 	self.contentSize = self.frame.size;
 }
 
+-(void)touchUpInsideTile:(id)sender{
+    if(self.delegate){
+        DARecycledTileView *tile = sender;
+        [self.delegate recycledScrollView:self didSelectTileAtIndex:tile.index];
+    }
+}
+
 - (void)configureTileView:(DARecycledTileView *)tileView forIndex:(NSUInteger)index
 {
     CGFloat width = [self widthForTileAtIndex:index];
@@ -116,6 +131,7 @@
     tileViewFrame.origin.x = [self combinedWidthForTilesUntilIndex:index];
     tileViewFrame.size.width = width;
     tileView.frame = tileViewFrame;
+    [tileView addTarget:self action:@selector(touchUpInsideTile:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (BOOL)isDisplayingTileForIndex:(NSUInteger)index
@@ -130,11 +146,13 @@
 
 - (NSUInteger)tilesCount
 {
+    if(self.dataSource == nil) return 0;
     return [self.dataSource numberOfTilesInScrollView:self];
 }
 
 - (void)tileViews
 {
+    if([self tilesCount] == 0) return;
     CGRect visibleBounds = self.bounds;
     NSInteger firstNeededTileIndex = 0;
     CGFloat width = [self widthForTileAtIndex:firstNeededTileIndex];
