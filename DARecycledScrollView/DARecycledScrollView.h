@@ -22,7 +22,7 @@
 
 @protocol DARecycledScrollViewDelegate <UIScrollViewDelegate>
 
-- (void)recycledScrollView:(DARecycledScrollView *)scrollVIew didSelectRowAtIndex:(NSUInteger)index;
+- (void)recycledScrollView:(DARecycledScrollView *)scrollView didSelectTileAtIndex:(NSUInteger)index;
 
 @end
 

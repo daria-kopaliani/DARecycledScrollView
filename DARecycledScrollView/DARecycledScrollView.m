@@ -120,7 +120,7 @@
 -(void)touchUpInsideTile:(id)sender{
     if(self.delegate){
         DARecycledTileView *tile = sender;
-        [self.delegate recycledScrollView:self didSelectRowAtIndex:tile.index];
+        [self.delegate recycledScrollView:self didSelectTileAtIndex:tile.index];
     }
 }
 
