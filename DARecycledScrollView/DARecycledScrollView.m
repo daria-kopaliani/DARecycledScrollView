@@ -138,6 +138,7 @@
 
 - (NSUInteger)tilesCount
 {
+    if(self.dataSource == nil) return 0;
     return [self.dataSource numberOfTilesInScrollView:self];
 }
 
@@ -238,6 +239,7 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    if([self tilesCount] == 0) return;
     CGFloat contentWidth = self.contentSize.width;
     if (self.infinite && self.contentOffset.x > contentWidth && !self.decelerating && !self.dragging) {
         CGFloat x = floorf(self.contentOffset.x / contentWidth) * contentWidth;
