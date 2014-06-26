@@ -8,14 +8,25 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_ENUM(NSInteger, DARecycledScrollDirection) {
+    DARecycledScrollDirectionHorizontal,
+    DARecycledScrollDirectionVertical
+};
 
 @class DARecycledScrollView, DARecycledTileView;
+
 @protocol DARecycledScrollViewDataSource <NSObject>
 
 - (NSInteger)numberOfTilesInScrollView:(DARecycledScrollView *)scrollView;
 - (void)recycledScrollView:(DARecycledScrollView *)scrollView configureTileView:(DARecycledTileView *)tileView forIndex:(NSUInteger)index;
 - (DARecycledTileView *)tileViewForRecycledScrollView:(DARecycledScrollView *)scrollView;
-- (CGFloat)widthForTileAtIndex:(NSInteger)index scrollView:(DARecycledScrollView *)scrollView;
+- (CGSize)sizeForTileAtIndex:(NSInteger)index scrollView:(DARecycledScrollView *)scrollView;
+
+@end
+
+@protocol DARecycledScrollViewDelegate <UIScrollViewDelegate>
+@optional
+- (void)recycledScrollView:(DARecycledScrollView *)scrollView didSelectTileAtIndex:(NSUInteger)index;
 
 @end
 
@@ -23,7 +34,10 @@
 @interface DARecycledScrollView : UIScrollView
 
 @property (assign, nonatomic) BOOL infinite;
-@property (weak, nonatomic) id<DARecycledScrollViewDataSource> dataSource;
+@property (assign, nonatomic) DARecycledScrollDirection scrollDirection;
+@property (weak, nonatomic) IBOutlet id<DARecycledScrollViewDataSource> dataSource;
+@property (weak, nonatomic) IBOutlet id<DARecycledScrollViewDelegate> delegate;
+
 
 - (DARecycledTileView *)dequeueRecycledTileView;
 - (void)reloadData;
