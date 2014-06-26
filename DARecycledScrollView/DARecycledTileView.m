@@ -23,6 +23,7 @@ static NSUInteger DARecycledTileViewCount = 0;
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    
     if (self.displayRecycledIndex) {
         if (!_countLabel) {
             DARecycledTileViewCount++;

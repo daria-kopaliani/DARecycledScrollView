@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DARecycledTileView : UIView
+@interface DARecycledTileView : UIControl
 
 @property (nonatomic, assign) NSUInteger index;
 @property (nonatomic, assign) BOOL displayRecycledIndex;

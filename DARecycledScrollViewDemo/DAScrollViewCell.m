@@ -57,10 +57,10 @@
     return tileView;
 }
 
-- (CGFloat)widthForTileAtIndex:(NSInteger)index scrollView:(DARecycledScrollView *)scrollView
+- (CGSize)sizeForTileAtIndex:(NSInteger)index scrollView:(DARecycledScrollView *)scrollView
 {
     UIImage *image = self.images[index];
-    return image.size.width;
+    return image.size;
 }
 
 @end

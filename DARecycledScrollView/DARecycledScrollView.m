@@ -45,6 +45,8 @@
 
 - (void)setUp
 {
+    self.scrollDirection = DARecycledScrollDirectionHorizontal;
+    self.infinite = NO;
     self.visibleTileViews = [NSMutableSet set];
 	self.recycledTileViews = [NSMutableSet set];
 }
@@ -83,16 +85,35 @@
         _infinite = infinite;
         [self clear];
     }
-    if (infinite) {
-        self.showsHorizontalScrollIndicator = NO;
+    if (self.dataSource!=nil) {
+        if (infinite) {
+            self.showsHorizontalScrollIndicator = NO;
+        }
+        [self reloadData];
+        
     }
-    [self reloadData];
+}
+
+- (void)setDataSource:(id<DARecycledScrollViewDataSource>)dataSource
+{
+    if (_dataSource != dataSource) {
+        _dataSource = dataSource;
+        [self reloadData];
+    }
 }
 
 - (void)setShowsHorizontalScrollIndicator:(BOOL)showsHorizontalScrollIndicator
 {
     if (!(showsHorizontalScrollIndicator && self.infinite)) {
         [super setShowsHorizontalScrollIndicator:showsHorizontalScrollIndicator];
+    }
+}
+
+
+- (void)setShowsVerticalScrollIndicator:(BOOL)showsScrollIndicator
+{
+    if (!(showsScrollIndicator && self.infinite)) {
+        [super setShowsVerticalScrollIndicator: showsScrollIndicator];
     }
 }
 
@@ -109,13 +130,31 @@
 	self.contentSize = self.frame.size;
 }
 
+-(void)touchUpInsideTile:(id)sender{
+    if(self.delegate){
+        DARecycledTileView *tile = sender;
+        
+        if ([self.delegate respondsToSelector:@selector(recycledScrollView:didSelectTileAtIndex:)]) {
+            [self.delegate recycledScrollView:self didSelectTileAtIndex:tile.index];
+        }
+        
+
+    }
+}
+
 - (void)configureTileView:(DARecycledTileView *)tileView forIndex:(NSUInteger)index
 {
-    CGFloat width = [self widthForTileAtIndex:index];
-	CGRect tileViewFrame = CGRectMake(0., 0., width, self.frame.size.height);
-    tileViewFrame.origin.x = [self combinedWidthForTilesUntilIndex:index];
-    tileViewFrame.size.width = width;
+    CGSize size = [self sizeForTileAtIndex:index];
+	CGRect tileViewFrame = {{0.,0.0},size };
+    if (self.scrollDirection == DARecycledScrollDirectionHorizontal) {
+        tileViewFrame.origin.x = [self combinedWidthForTilesUntilIndex:index];
+    }
+    else
+    {
+        tileViewFrame.origin.y = [self combinedHeigthForTilesUntilIndex:index];
+    }
     tileView.frame = tileViewFrame;
+    [tileView addTarget:self action:@selector(touchUpInsideTile:) forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (BOOL)isDisplayingTileForIndex:(NSUInteger)index
@@ -130,25 +169,46 @@
 
 - (NSUInteger)tilesCount
 {
+    if(self.dataSource == nil) return 0;
     return [self.dataSource numberOfTilesInScrollView:self];
 }
 
 - (void)tileViews
 {
+    if([self tilesCount] == 0) return;
     CGRect visibleBounds = self.bounds;
     NSInteger firstNeededTileIndex = 0;
-    CGFloat width = [self widthForTileAtIndex:firstNeededTileIndex];
     
-    while (width < CGRectGetMinX(visibleBounds)) {
-        firstNeededTileIndex++;
-        width += [self widthForTileAtIndex:firstNeededTileIndex];
+    CGSize size = [self sizeForTileAtIndex:firstNeededTileIndex];    
+    if (self.scrollDirection == DARecycledScrollDirectionHorizontal) {
+        while (size.width < CGRectGetMinX(visibleBounds)) {
+            firstNeededTileIndex++;
+            size.width += [self sizeForTileAtIndex:firstNeededTileIndex].width;
+        }
+    }
+    else
+    {
+        while (size.height < CGRectGetMinY(visibleBounds)) {
+            firstNeededTileIndex++;
+            size.height += [self sizeForTileAtIndex:firstNeededTileIndex].height;
+        }
     }
     
     NSInteger lastNeededTileIndex = firstNeededTileIndex;
-    while (width <= CGRectGetMaxX(visibleBounds)) {
-        lastNeededTileIndex++;
-        width += [self widthForTileAtIndex:lastNeededTileIndex];
+    if (self.scrollDirection == DARecycledScrollDirectionHorizontal) {
+        while (size.width <= CGRectGetMaxX(visibleBounds)) {
+            lastNeededTileIndex++;
+            size.width += [self sizeForTileAtIndex:lastNeededTileIndex].width;
+        }
     }
+    else
+    {
+        while (size.height <= CGRectGetMaxY(visibleBounds)) {
+            lastNeededTileIndex++;
+            size.height += [self sizeForTileAtIndex:lastNeededTileIndex].height;
+        }
+    }
+    
     if (!self.clipsToBounds) {
         firstNeededTileIndex--;
         lastNeededTileIndex++;
@@ -157,12 +217,23 @@
     if (!self.infinite) {
         lastNeededTileIndex = MIN(lastNeededTileIndex, [self tilesCount] - 1);
     } else {
-        CGFloat actualWidth = [self combinedWidthForTilesUntilIndex:lastNeededTileIndex + 1];
-        while (actualWidth < CGRectGetMaxX(visibleBounds)) {
-            lastNeededTileIndex += [self tilesCount];
-            actualWidth = [self combinedWidthForTilesUntilIndex:lastNeededTileIndex + 1];
+        if (self.scrollDirection == DARecycledScrollDirectionHorizontal) {
+            CGFloat actualWidth = [self combinedWidthForTilesUntilIndex:lastNeededTileIndex + 1];
+            while (actualWidth < CGRectGetMaxX(visibleBounds)) {
+                lastNeededTileIndex += [self tilesCount];
+                actualWidth = [self combinedWidthForTilesUntilIndex:lastNeededTileIndex + 1];
+            }
+        }
+        else
+        {
+            CGFloat actualHeigth = [self combinedHeigthForTilesUntilIndex:lastNeededTileIndex + 1];
+            while (actualHeigth < CGRectGetMaxY(visibleBounds)) {
+                lastNeededTileIndex += [self tilesCount];
+                actualHeigth = [self combinedHeigthForTilesUntilIndex:lastNeededTileIndex + 1];
+            }
         }
     }
+    
     for (DARecycledTileView *tileView in self.visibleTileViews) {
         if (tileView.index < firstNeededTileIndex || tileView.index > lastNeededTileIndex) {
             [self.recycledTileViews addObject:tileView];
@@ -195,16 +266,26 @@
 {
     CGFloat width = 0.;
     for (NSInteger i = 0; i < index; i++) {
-        width += [self widthForTileAtIndex:i];
+        width += [self sizeForTileAtIndex:i].width;
     }
     return width;
 }
 
-- (CGFloat)widthForTileAtIndex:(NSInteger)index
+- (CGFloat)combinedHeigthForTilesUntilIndex:(NSInteger)index
+{
+    CGFloat heigth = 0.;
+    for (NSInteger i = 0; i < index; i++) {
+        heigth += [self sizeForTileAtIndex:i].height;
+    }
+    return heigth;
+}
+
+
+- (CGSize)sizeForTileAtIndex:(NSInteger)index
 {
     NSInteger page = floorf((float)index / (float)[self tilesCount]);
     NSInteger actualIndex = (index < [self tilesCount]) ? index : index - page * [self tilesCount];
-    return [self.dataSource widthForTileAtIndex:actualIndex scrollView:self];
+    return [self.dataSource sizeForTileAtIndex:actualIndex scrollView:self];
 }
 
 - (DARecycledTileView *)visibleTileViewForIndex:(NSUInteger)index
@@ -222,18 +303,45 @@
 - (CGSize)contentSize
 {
     if (self.infinite) {
-        return CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.frame));
+        if (self.scrollDirection == DARecycledScrollDirectionHorizontal) {
+            return CGSizeMake(CGFLOAT_MAX, CGRectGetHeight(self.frame));
+        }
+        else
+        {
+            return CGSizeMake( CGRectGetWidth(self.frame),CGFLOAT_MAX);
+        }
+
     }
-    return CGSizeMake([self combinedWidthForTilesUntilIndex:[self tilesCount]], self.frame.size.height);
+    
+    if (self.scrollDirection == DARecycledScrollDirectionHorizontal) {
+        return CGSizeMake([self combinedWidthForTilesUntilIndex:[self tilesCount]], self.frame.size.height);
+    }
+    else
+    {
+        return CGSizeMake(self.frame.size.width,[self combinedHeigthForTilesUntilIndex:[self tilesCount]]);
+    }
+    
+
 }
 
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    CGFloat contentWidth = self.contentSize.width;
-    if (self.infinite && self.contentOffset.x > contentWidth && !self.decelerating && !self.dragging) {
-        CGFloat x = floorf(self.contentOffset.x / contentWidth) * contentWidth;
-        [self setContentOffset:CGPointMake(self.contentOffset.x - x, self.contentOffset.y) animated:NO];
+    if (self.scrollDirection == DARecycledScrollDirectionHorizontal){
+        CGFloat contentWidth = self.contentSize.width;
+        if (self.infinite && self.contentOffset.x > contentWidth && !self.decelerating && !self.dragging) {
+            CGFloat x = floorf(self.contentOffset.x / contentWidth) * contentWidth;
+            [self setContentOffset:CGPointMake(self.contentOffset.x - x, self.contentOffset.y) animated:NO];
+        }
+    }
+    else
+    {
+        CGFloat contentHeigth = self.contentSize.height;
+        if (self.infinite && self.contentOffset.y > contentHeigth && !self.decelerating && !self.dragging) {
+            CGFloat y = floorf(self.contentOffset.y / contentHeigth) * contentHeigth;
+            [self setContentOffset:CGPointMake(self.contentOffset.x, self.contentOffset.y-y) animated:NO];
+        }
+
     }
     [self tileViews];
 }
