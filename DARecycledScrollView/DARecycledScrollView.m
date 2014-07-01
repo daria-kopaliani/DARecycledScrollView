@@ -60,6 +60,10 @@
     return tileView;
 }
 
+- (void)scrollToTileViewAtIndex:(NSUInteger)index animated:(BOOL)animated {
+    [self setContentOffset:CGPointMake(index * self.frame.size.width, 0) animated:animated];
+}
+
 - (void)reloadData
 {
 	self.contentSize = [self contentSize];

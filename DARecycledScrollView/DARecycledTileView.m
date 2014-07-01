@@ -32,7 +32,7 @@ static NSUInteger DARecycledTileViewCount = 0;
             self.countLabel.textColor = [UIColor colorWithRed:0.7 green:0.7 blue:0.7 alpha:0.6];
             self.countLabel.shadowColor = [UIColor whiteColor];
             self.countLabel.shadowOffset = CGSizeMake(1., 1.);
-            self.countLabel.text = [NSString stringWithFormat:@"%d", DARecycledTileViewCount];
+            self.countLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)DARecycledTileViewCount];
             [self addSubview:self.countLabel];
         }
         [self bringSubviewToFront:self.countLabel];
@@ -48,7 +48,7 @@ static NSUInteger DARecycledTileViewCount = 0;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"Recycled index: %d, %@", self.index, [super description]];
+    return [NSString stringWithFormat:@"Recycled index: %lu, %@", (unsigned long)self.index, [super description]];
 }
 
 @end

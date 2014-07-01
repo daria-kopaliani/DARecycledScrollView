@@ -26,6 +26,7 @@
 @property (weak, nonatomic) id<DARecycledScrollViewDataSource> dataSource;
 
 - (DARecycledTileView *)dequeueRecycledTileView;
+- (void)scrollToTileViewAtIndex:(NSUInteger)index animated:(BOOL)animated;
 - (void)reloadData;
 
 @end
